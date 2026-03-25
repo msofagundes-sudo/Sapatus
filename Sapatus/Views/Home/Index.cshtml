@@ -1,0 +1,215 @@
+@{
+    ViewData["Title"] = "Início";
+    var produtosDestaque = ViewBag.ProdutosDestaque as List<Sapatus.Models.Produto> ?? new List<Sapatus.Models.Produto>();
+    var todosProdutos = ViewBag.TodosProdutos as List<Sapatus.Models.Produto> ?? new List<Sapatus.Models.Produto>();
+}
+
+<!-- Hero Section -->
+<section class="hero-section">
+    <div class="container">
+        <div class="row align-items-center">
+            <div class="col-lg-6 hero-content">
+                <h1 class="hero-title">Descobre o teu <span>estilo</span> perfeito</h1>
+                <p class="hero-subtitle">Os melhores ténis das marcas mais conceituadas. Encontra o par ideal para cada momento da tua vida.</p>
+                <a asp-controller="Produtos" asp-action="Index" class="btn-hero">
+                    <i class="fas fa-shopping-bag me-2"></i>Explorar Loja
+                </a>
+            </div>
+            <div class="col-lg-6 hero-image text-center">
+                <img src="https://images.unsplash.com/photo-1542291026-7eec264c27ff?w=600" alt="Ténis em destaque" />
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Features Section -->
+<section class="section" style="background: white;">
+    <div class="container">
+        <div class="row g-4">
+            <div class="col-md-4">
+                <div class="text-center">
+                    <div class="icon-box mb-3">
+                        <i class="fas fa-truck fa-3x text-primary"></i>
+                    </div>
+                    <h4>Entrega Rápida</h4>
+                    <p class="text-muted">Recebe os teus ténis em 24-48h em qualquer parte de Portugal.</p>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="text-center">
+                    <div class="icon-box mb-3">
+                        <i class="fas fa-shield-alt fa-3x text-primary"></i>
+                    </div>
+                    <h4>100% Original</h4>
+                    <p class="text-muted">Todos os produtos são garantidamente originais e autênticos.</p>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="text-center">
+                    <div class="icon-box mb-3">
+                        <i class="fas fa-undo fa-3x text-primary"></i>
+                    </div>
+                    <h4>Trocas Grátis</h4>
+                    <p class="text-muted">Não serviu? Troca gratuitamente em qualquer tamanho ou cor.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Featured Products -->
+<section class="section">
+    <div class="container">
+        <div class="section-title">
+            <h2>Produtos em Destaque</h2>
+            <div class="line"></div>
+            <p>Os modelos mais populares da nossa coleção</p>
+        </div>
+        
+        <div class="row g-4">
+            @foreach (var produto in produtosDestaque)
+            {
+                <div class="col-lg-4 col-md-6">
+                    <div class="card card-product h-100">
+                        <div class="card-img-wrapper">
+                            <span class="badge-category">@produto.Categoria</span>
+                            <img src="@produto.ImagemUrl" class="card-img-top" alt="@produto.Nome" loading="lazy">
+                        </div>
+                        <div class="card-body d-flex flex-column">
+                            <h5 class="card-title">@produto.Nome</h5>
+                            <p class="card-text flex-grow-1">@(produto.Descricao?.Length > 80 ? produto.Descricao.Substring(0, 80) + "..." : produto.Descricao)</p>
+                            <div class="d-flex justify-content-between align-items-center mt-3">
+                                <span class="price">@produto.Preco.ToString("C")</span>
+                                <a asp-controller="Produtos" asp-action="Details" asp-route-id="@produto.Id" class="btn btn-primary btn-sm">
+                                    <i class="fas fa-eye me-1"></i>Ver
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            }
+        </div>
+        
+        <div class="text-center mt-5">
+            <a asp-controller="Produtos" asp-action="Index" class="btn btn-outline-primary btn-lg">
+                Ver Todos os Produtos <i class="fas fa-arrow-right ms-2"></i>
+            </a>
+        </div>
+    </div>
+</section>
+
+<!-- Categories Section -->
+<section class="section" style="background: white;">
+    <div class="container">
+        <div class="section-title">
+            <h2>Categorias</h2>
+            <div class="line"></div>
+            <p>Encontra o ténis perfeito para cada atividade</p>
+        </div>
+        
+        <div class="row g-4">
+            @foreach (var categoria in Enum.GetValues(typeof(Sapatus.Models.CategoriaProduto)))
+            {
+                <div class="col-lg-3 col-md-4 col-6">
+                    <a asp-controller="Produtos" asp-action="Index" asp-route-categoria="@categoria" class="text-decoration-none">
+                        <div class="card text-center h-100 category-card">
+                            <div class="card-body">
+                                <i class="fas fa-shoe-prints fa-3x text-primary mb-3"></i>
+                                <h5 class="card-title text-dark">@categoria</h5>
+                            </div>
+                        </div>
+                    </a>
+                </div>
+            }
+        </div>
+    </div>
+</section>
+
+<!-- Brands Section -->
+<section class="section">
+    <div class="container">
+        <div class="section-title">
+            <h2>As Melhores Marcas</h2>
+            <div class="line"></div>
+            <p>Trabalhamos apenas com as marcas mais conceituadas do mercado</p>
+        </div>
+        
+        <div class="row g-4 justify-content-center">
+            <div class="col-6 col-md-3">
+                <div class="card text-center p-4">
+                    <h4 class="m-0 text-gradient">NIKE</h4>
+                </div>
+            </div>
+            <div class="col-6 col-md-3">
+                <div class="card text-center p-4">
+                    <h4 class="m-0 text-gradient">ADIDAS</h4>
+                </div>
+            </div>
+            <div class="col-6 col-md-3">
+                <div class="card text-center p-4">
+                    <h4 class="m-0 text-gradient">PUMA</h4>
+                </div>
+            </div>
+            <div class="col-6 col-md-3">
+                <div class="card text-center p-4">
+                    <h4 class="m-0 text-gradient">NEW BALANCE</h4>
+                </div>
+            </div>
+            <div class="col-6 col-md-3">
+                <div class="card text-center p-4">
+                    <h4 class="m-0 text-gradient">ASICS</h4>
+                </div>
+            </div>
+            <div class="col-6 col-md-3">
+                <div class="card text-center p-4">
+                    <h4 class="m-0 text-gradient">VANS</h4>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- CTA Section -->
+<section class="section" style="background: linear-gradient(135deg, var(--dark-color) 0%, var(--primary-dark) 100%);">
+    <div class="container text-center text-white">
+        <h2 class="mb-4">Junta-te à comunidade Sapatus</h2>
+        <p class="lead mb-4">Cria a tua conta gratuita e começa a comprar com a nossa carteira digital</p>
+        @if (!User.Identity?.IsAuthenticated == true)
+        {
+            <a asp-area="Identity" asp-page="/Account/Register" class="btn btn-light btn-lg">
+                <i class="fas fa-user-plus me-2"></i>Criar Conta
+            </a>
+        }
+        else
+        {
+            <a asp-controller="Wallet" asp-action="Index" class="btn btn-light btn-lg">
+                <i class="fas fa-wallet me-2"></i>Ver Minha Carteira
+            </a>
+        }
+    </div>
+</section>
+
+@section Styles {
+    <style>
+        .category-card {
+            transition: all 0.3s ease;
+            border: 2px solid transparent;
+        }
+        
+        .category-card:hover {
+            border-color: var(--primary-color);
+            transform: translateY(-5px);
+        }
+        
+        .icon-box {
+            width: 80px;
+            height: 80px;
+            background: linear-gradient(135deg, #f1f5f9 0%, #e2e8f0 100%);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto;
+        }
+    </style>
+}

@@ -1,0 +1,31 @@
+@using Sapatus.Controllers
+@model ErrorViewModel
+@{
+    ViewData["Title"] = "Erro";
+}
+
+<div class="container py-5">
+    <div class="row justify-content-center">
+        <div class="col-lg-6 text-center">
+            <div class="mb-4">
+                <i class="fas fa-exclamation-triangle fa-5x text-warning"></i>
+            </div>
+            <h1 class="display-4 mb-3">Oops!</h1>
+            <h2 class="mb-4">Ocorreu um erro</h2>
+            <p class="lead text-muted mb-4">Pedimos desculpe pelo inconveniente. Ocorreu um erro ao processar o teu pedido.</p>
+            
+            @if (Model.ShowRequestId)
+            {
+                <div class="alert alert-secondary">
+                    <strong>ID do Pedido:</strong> <code>@Model.RequestId</code>
+                </div>
+            }
+            
+            <div class="mt-4">
+                <a asp-controller="Home" asp-action="Index" class="btn btn-primary btn-lg">
+                    <i class="fas fa-home me-2"></i>Voltar ao Início
+                </a>
+            </div>
+        </div>
+    </div>
+</div>

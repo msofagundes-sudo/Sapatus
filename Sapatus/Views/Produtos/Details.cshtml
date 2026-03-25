@@ -1,0 +1,255 @@
+@model Sapatus.Models.ViewModels.ProdutoDetalhesViewModel
+@{
+    ViewData["Title"] = Model.Produto?.Nome ?? "Detalhes do Produto";
+    var tamanhos = Model.TamanhosDisponiveis ?? new List<string?>();
+    var cores = Model.CoresDisponiveis ?? new List<string?>();
+    var tamanhoCorMap = Model.TamanhoCorMap ?? new Dictionary<string, List<string>>();
+}
+
+<!-- Breadcrumb -->
+<div class="container py-3">
+    <nav aria-label="breadcrumb">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item"><a asp-controller="Home" asp-action="Index">Início</a></li>
+            <li class="breadcrumb-item"><a asp-action="Index">Loja</a></li>
+            <li class="breadcrumb-item active">@Model.Produto?.Nome</li>
+        </ol>
+    </nav>
+</div>
+
+<!-- Product Details -->
+<section class="section pt-0">
+    <div class="container">
+        <div class="row g-5">
+            <!-- Product Image -->
+            <div class="col-lg-6">
+                <div class="product-gallery">
+                    <img src="@Model.Produto?.ImagemUrl" alt="@Model.Produto?.Nome" class="img-fluid">
+                </div>
+            </div>
+
+            <!-- Product Info -->
+            <div class="col-lg-6">
+                <div class="product-info">
+                    <span class="badge bg-primary mb-3">@Model.Produto?.Categoria</span>
+                    @if (Model.Produto?.EmDestaque == true)
+                    {
+                        <span class="badge bg-warning mb-3 ms-2"><i class="fas fa-star me-1"></i>Em Destaque</span>
+                    }
+                    
+                    <h1>@Model.Produto?.Nome</h1>
+                    
+                    @if (!string.IsNullOrEmpty(Model.Produto?.Marca))
+                    {
+                        <p class="text-muted mb-3">
+                            <i class="fas fa-tag me-1"></i>Marca: <strong>@Model.Produto.Marca</strong>
+                        </p>
+                    }
+                    
+                    <div class="price">@Model.Produto?.Preco.ToString("C")</div>
+                    
+                    <div class="description">
+                        @Model.Produto?.Descricao
+                    </div>
+                    
+                    <!-- Stock Info -->
+                    <div class="mb-4">
+                        @if (Model.StockTotal > 10)
+                        {
+                            <span class="stock-info">
+                                <i class="fas fa-check-circle"></i>Em stock (@Model.StockTotal unidades)
+                            </span>
+                        }
+                        else if (Model.StockTotal > 0)
+                        {
+                            <span class="stock-info low">
+                                <i class="fas fa-exclamation-circle"></i>Últimas unidades (@Model.StockTotal restantes)
+                            </span>
+                        }
+                        else
+                        {
+                            <span class="stock-info out">
+                                <i class="fas fa-times-circle"></i>Esgotado
+                            </span>
+                        }
+                    </div>
+
+                    @if (Model.StockTotal > 0)
+                    {
+                        <form asp-action="AdicionarCarrinho" method="post" id="formAdicionarCarrinho">
+                            @Html.AntiForgeryToken()
+                            <input type="hidden" name="ProdutoId" value="@Model.Produto?.Id" />
+                            <input type="hidden" name="Tamanho" id="selectedTamanho" />
+                            <input type="hidden" name="Cor" id="selectedCor" />
+
+                            <!-- Size Selector -->
+                            <div class="size-selector">
+                                <label>Tamanho <span class="text-danger">*</span></label>
+                                <div class="size-options">
+                                    @foreach (var tamanho in tamanhos.Where(t => !string.IsNullOrEmpty(t)))
+                                    {
+                                        <div class="size-option" data-tamanho="@tamanho">@tamanho</div>
+                                    }
+                                </div>
+                                <span id="tamanho-error" class="text-danger" style="display: none;">Seleciona um tamanho</span>
+                            </div>
+
+                            <!-- Color Selector -->
+                            <div class="color-selector">
+                                <label>Cor <span class="text-danger">*</span></label>
+                                <div class="color-options" id="colorOptions">
+                                    @foreach (var cor in cores.Where(c => !string.IsNullOrEmpty(c)))
+                                    {
+                                        <div class="color-option disabled" data-cor="@cor">@cor</div>
+                                    }
+                                </div>
+                                <span id="cor-error" class="text-danger" style="display: none;">Seleciona uma cor</span>
+                            </div>
+
+                            <!-- Quantity -->
+                            <div class="mb-4">
+                                <label class="form-label">Quantidade</label>
+                                <div class="quantity-control">
+                                    <button type="button" onclick="decrementarQuantidade()">-</button>
+                                    <input type="number" name="Quantidade" id="quantidade" value="1" min="1" max="10" class="form-control" readonly>
+                                    <button type="button" onclick="incrementarQuantidade()">+</button>
+                                </div>
+                            </div>
+
+                            <!-- Add to Cart Button -->
+                            <button type="submit" class="btn btn-primary btn-lg w-100" id="btnAdicionar">
+                                <i class="fas fa-shopping-cart me-2"></i>Adicionar ao Carrinho
+                            </button>
+                        </form>
+                    }
+                    else
+                    {
+                        <div class="alert alert-warning">
+                            <i class="fas fa-exclamation-triangle me-2"></i>
+                            Este produto está atualmente esgotado. Volta mais tarde!
+                        </div>
+                    }
+
+                    <!-- Features -->
+                    <div class="row mt-5 pt-4 border-top">
+                        <div class="col-4 text-center">
+                            <i class="fas fa-truck fa-2x text-primary mb-2"></i>
+                            <p class="small text-muted mb-0">Entrega Rápida</p>
+                        </div>
+                        <div class="col-4 text-center">
+                            <i class="fas fa-shield-alt fa-2x text-primary mb-2"></i>
+                            <p class="small text-muted mb-0">100% Original</p>
+                        </div>
+                        <div class="col-4 text-center">
+                            <i class="fas fa-undo fa-2x text-primary mb-2"></i>
+                            <p class="small text-muted mb-0">Trocas Grátis</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+@section Scripts {
+    <script>
+        // Mapeamento de tamanho -> cores disponíveis
+        const tamanhoCorMap = @Html.Raw(Json.Serialize(tamanhoCorMap));
+        
+        let tamanhoSelecionado = null;
+        let corSelecionada = null;
+
+        // Selecionar tamanho
+        document.querySelectorAll('.size-option').forEach(option => {
+            option.addEventListener('click', function() {
+                if (this.classList.contains('disabled')) return;
+                
+                // Remover seleção anterior
+                document.querySelectorAll('.size-option').forEach(o => o.classList.remove('selected'));
+                
+                // Selecionar novo
+                this.classList.add('selected');
+                tamanhoSelecionado = this.dataset.tamanho;
+                document.getElementById('selectedTamanho').value = tamanhoSelecionado;
+                
+                // Atualizar cores disponíveis
+                atualizarCoresDisponiveis(tamanhoSelecionado);
+                
+                // Esconder erro
+                document.getElementById('tamanho-error').style.display = 'none';
+            });
+        });
+
+        // Selecionar cor
+        document.querySelectorAll('.color-option').forEach(option => {
+            option.addEventListener('click', function() {
+                if (this.classList.contains('disabled')) return;
+                
+                // Remover seleção anterior
+                document.querySelectorAll('.color-option').forEach(o => o.classList.remove('selected'));
+                
+                // Selecionar novo
+                this.classList.add('selected');
+                corSelecionada = this.dataset.cor;
+                document.getElementById('selectedCor').value = corSelecionada;
+                
+                // Esconder erro
+                document.getElementById('cor-error').style.display = 'none';
+            });
+        });
+
+        function atualizarCoresDisponiveis(tamanho) {
+            const coresDisponiveis = tamanhoCorMap[tamanho] || [];
+            
+            document.querySelectorAll('.color-option').forEach(option => {
+                const cor = option.dataset.cor;
+                if (coresDisponiveis.includes(cor)) {
+                    option.classList.remove('disabled');
+                } else {
+                    option.classList.add('disabled');
+                    option.classList.remove('selected');
+                }
+            });
+            
+            // Reset cor selecionada
+            corSelecionada = null;
+            document.getElementById('selectedCor').value = '';
+        }
+
+        function incrementarQuantidade() {
+            const input = document.getElementById('quantidade');
+            const max = parseInt(input.max);
+            const current = parseInt(input.value);
+            if (current < max) {
+                input.value = current + 1;
+            }
+        }
+
+        function decrementarQuantidade() {
+            const input = document.getElementById('quantidade');
+            const current = parseInt(input.value);
+            if (current > 1) {
+                input.value = current - 1;
+            }
+        }
+
+        // Validação do formulário
+        document.getElementById('formAdicionarCarrinho').addEventListener('submit', function(e) {
+            let valid = true;
+            
+            if (!tamanhoSelecionado) {
+                document.getElementById('tamanho-error').style.display = 'block';
+                valid = false;
+            }
+            
+            if (!corSelecionada) {
+                document.getElementById('cor-error').style.display = 'block';
+                valid = false;
+            }
+            
+            if (!valid) {
+                e.preventDefault();
+            }
+        });
+    </script>
+}
